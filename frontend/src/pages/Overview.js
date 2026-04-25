@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  Tooltip, ResponsiveContainer,
 } from 'recharts';
 import KPICard from '../components/KPICard';
 import ChartCard from '../components/ChartCard';
@@ -39,19 +39,20 @@ export default function Overview() {
 
   const monthlyFormatted = Array.isArray(monthly) ? monthly.map(m => ({
     ...m,
-    name: MONTH_NAMES[m.month],
+    name: MONTH_NAMES[m.month] || m.month,
     revenue_k: +(m.total_revenue / 1000).toFixed(1),
   })) : [];
 
-  const weatherPie = Array.isArray(weather) ? weather.map(w => ({
+  const weatherData = Array.isArray(weather) ? weather.map(w => ({
     name: w.weather,
-    value: w.total_rides,
+    rides: w.total_rides,
     color: WEATHER_COLORS[w.weather] || '#4f8ef7',
   })) : [];
 
+  const hourlyData = Array.isArray(hourly) ? hourly : [];
+
   return (
     <div className="page">
-      {/* Header */}
       <div className="page-header">
         <div className="overview-header-content">
           <div>
@@ -65,114 +66,42 @@ export default function Overview() {
         </div>
       </div>
 
-      {/* KPI Grid */}
+      {/* KPI Row 1 */}
       <section className="section">
         {statsLoading ? (
           <div className="grid-4">
-            {[...Array(4)].map((_, i) => <SkeletonCard key={i} height={160} />)}
+            {[0,1,2,3].map(i => <SkeletonCard key={i} height={160} />)}
           </div>
         ) : (
           <div className="grid-4">
-            <KPICard
-              icon="🚗"
-              label="Total Rides"
-              value={stats?.total_rides || 0}
-              gradient="blue"
-              change={12.4}
-              changeLabel="vs last period"
-              delay={0}
-            />
-            <KPICard
-              icon="💰"
-              label="Total Revenue"
-              value={+(stats?.total_revenue / 1000 || 0).toFixed(0)}
-              prefix="$"
-              suffix="K"
-              gradient="green"
-              change={8.7}
-              changeLabel="vs last period"
-              delay={0.1}
-            />
-            <KPICard
-              icon="⏱️"
-              label="Avg Wait Time"
-              value={stats?.avg_wait || 0}
-              suffix=" min"
-              decimals={1}
-              gradient="orange"
-              change={-5.2}
-              changeLabel="improvement"
-              delay={0.2}
-            />
-            <KPICard
-              icon="❌"
-              label="Cancellation Rate"
-              value={stats?.cancellation_rate || 0}
-              suffix="%"
-              decimals={1}
-              gradient="purple"
-              change={-2.1}
-              changeLabel="improvement"
-              delay={0.3}
-            />
+            <KPICard icon="🚗" label="Total Rides" value={stats?.total_rides || 0} gradient="blue" change={12.4} changeLabel="vs last period" />
+            <KPICard icon="💰" label="Total Revenue" value={Math.round((stats?.total_revenue || 0) / 1000)} prefix="$" suffix="K" gradient="green" change={8.7} changeLabel="vs last period" />
+            <KPICard icon="⏱️" label="Avg Wait Time" value={stats?.avg_wait || 0} suffix=" min" decimals={1} gradient="orange" change={-5.2} changeLabel="improvement" />
+            <KPICard icon="❌" label="Cancellation Rate" value={stats?.cancellation_rate || 0} suffix="%" decimals={1} gradient="purple" change={-2.1} changeLabel="improvement" />
           </div>
         )}
       </section>
 
-      {/* Second KPI row */}
+      {/* KPI Row 2 */}
       <section className="section">
         {statsLoading ? (
           <div className="grid-4">
-            {[...Array(4)].map((_, i) => <SkeletonCard key={i} height={140} />)}
+            {[0,1,2,3].map(i => <SkeletonCard key={i} height={140} />)}
           </div>
         ) : (
           <div className="grid-4">
-            <KPICard
-              icon="📍"
-              label="Avg Fare"
-              value={stats?.avg_fare || 0}
-              prefix="$"
-              decimals={2}
-              gradient="pink"
-              delay={0.1}
-            />
-            <KPICard
-              icon="🛣️"
-              label="Avg Distance"
-              value={stats?.avg_distance || 0}
-              suffix=" km"
-              decimals={1}
-              gradient="blue"
-              delay={0.15}
-            />
-            <KPICard
-              icon="⚡"
-              label="Surge Rate"
-              value={stats?.surge_rate || 0}
-              suffix="%"
-              decimals={1}
-              gradient="orange"
-              delay={0.2}
-            />
-            <KPICard
-              icon="🏆"
-              label="Peak Hour"
-              value={stats?.busiest_hour || 0}
-              suffix=":00"
-              gradient="green"
-              delay={0.25}
-            />
+            <KPICard icon="📍" label="Avg Fare" value={stats?.avg_fare || 0} prefix="$" decimals={2} gradient="pink" />
+            <KPICard icon="🛣️" label="Avg Distance" value={stats?.avg_distance || 0} suffix=" km" decimals={1} gradient="blue" />
+            <KPICard icon="⚡" label="Surge Rate" value={stats?.surge_rate || 0} suffix="%" decimals={1} gradient="orange" />
+            <KPICard icon="🏆" label="Peak Hour" value={stats?.busiest_hour || 0} suffix=":00" gradient="green" />
           </div>
         )}
       </section>
 
-      {/* Charts row 1 */}
+      {/* Charts Row */}
       <section className="section grid-2">
-        <ChartCard
-          title="Monthly Revenue Trend"
-          subtitle="Total fare revenue across 12 months"
-        >
-          {monthlyLoading ? <SkeletonCard height={260} /> : (
+        <ChartCard title="Monthly Revenue Trend" subtitle="Total fare revenue across 12 months">
+          {monthlyLoading || !monthlyFormatted.length ? <SkeletonCard height={260} /> : (
             <ResponsiveContainer width="100%" height={260}>
               <AreaChart data={monthlyFormatted}>
                 <defs>
@@ -191,31 +120,16 @@ export default function Overview() {
           )}
         </ChartCard>
 
-        <ChartCard
-          title="Rides by Weather"
-          subtitle="Distribution of rides across weather conditions"
-        >
-          {weatherLoading ? <SkeletonCard height={260} /> : (
+        <ChartCard title="Rides by Weather" subtitle="Total rides per weather condition">
+          {weatherLoading || !weatherData.length ? <SkeletonCard height={260} /> : (
             <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie
-                  data={weatherPie}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={70}
-                  outerRadius={100}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {weatherPie?.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
-                  ))}
-                </Pie>
+              <BarChart data={weatherData} barSize={40}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="name" tick={{ fill: '#8892b0', fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: '#8892b0', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend
-                  formatter={(value) => <span style={{ color: '#8892b0', fontSize: 12 }}>{value}</span>}
-                />
-              </PieChart>
+                <Bar dataKey="rides" name="Rides" fill="#06b6d4" radius={[6, 6, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           )}
         </ChartCard>
@@ -223,13 +137,10 @@ export default function Overview() {
 
       {/* Hourly demand */}
       <section className="section">
-        <ChartCard
-          title="24-Hour Demand Pattern"
-          subtitle="Average demand score and ride volume by hour of day"
-        >
-          {hourlyLoading ? <SkeletonCard height={280} /> : (
+        <ChartCard title="24-Hour Demand Pattern" subtitle="Ride volume by hour of day">
+          {hourlyLoading || !hourlyData.length ? <SkeletonCard height={280} /> : (
             <ResponsiveContainer width="100%" height={280}>
-              <BarChart data={hourly} barSize={18}>
+              <BarChart data={hourlyData} barSize={18}>
                 <defs>
                   <linearGradient id="demandGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#a855f7" stopOpacity={0.9} />
@@ -237,8 +148,7 @@ export default function Overview() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="hour" tick={{ fill: '#8892b0', fontSize: 11 }} axisLine={false} tickLine={false}
-                  tickFormatter={h => `${h}:00`} />
+                <XAxis dataKey="hour" tick={{ fill: '#8892b0', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={h => `${h}h`} />
                 <YAxis tick={{ fill: '#8892b0', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="total_rides" name="Total Rides" fill="url(#demandGrad)" radius={[4, 4, 0, 0]} />
@@ -248,17 +158,17 @@ export default function Overview() {
         </ChartCard>
       </section>
 
-      {/* Zone top performers */}
+      {/* System Status */}
       <section className="section">
         <ChartCard title="System Status" subtitle="Platform health indicators">
           <div className="status-grid">
             {[
-              { label: 'Data Pipeline', status: 'Operational', color: 'green' },
-              { label: 'ML Models', status: 'Active', color: 'green' },
-              { label: 'Simulation Engine', status: 'Ready', color: 'blue' },
-              { label: 'Agent System', status: 'Standby', color: 'orange' },
-              { label: 'Decision Engine', status: 'Operational', color: 'green' },
-              { label: 'AI Insights', status: 'Active', color: 'purple' },
+              { label: 'Data Pipeline',    status: 'Operational', color: 'green' },
+              { label: 'ML Models',        status: 'Active',      color: 'green' },
+              { label: 'Simulation Engine',status: 'Ready',       color: 'blue'  },
+              { label: 'Agent System',     status: 'Standby',     color: 'orange'},
+              { label: 'Decision Engine',  status: 'Operational', color: 'green' },
+              { label: 'AI Insights',      status: 'Active',      color: 'purple'},
             ].map((item, i) => (
               <div key={i} className="status-item">
                 <span className={`status-indicator ${item.color}`} />
