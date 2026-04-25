@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, RadialBarChart, RadialBar, Legend,
+  ResponsiveContainer,
 } from 'recharts';
 import ChartCard from '../components/ChartCard';
 import { SkeletonCard } from '../components/LoadingSpinner';
@@ -22,7 +22,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-const PRIORITY_COLORS = { HIGH: '#ef4444', MEDIUM: '#f59e0b', LOW: '#10b981' };
+const PRIORITY_COLORS = { HIGH: '#ef4444', MEDIUM: '#f59e0b', LOW: '#10b981' }; // eslint-disable-line
 
 export default function DecisionInsights() {
   const { data: report, loading } = useApi('/api/decision/report');

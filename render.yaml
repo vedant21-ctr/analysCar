@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: urban-mobility-os-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python data/generate_dataset.py
+    startCommand: uvicorn backend.api.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+    healthCheckPath: /

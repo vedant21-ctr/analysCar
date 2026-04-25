@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Set REACT_APP_API_URL in Vercel dashboard to your Render backend URL
 
 const api = axios.create({ baseURL: BASE_URL, timeout: 30000 });
 
@@ -9,6 +10,8 @@ export function useApi(endpoint, options = {}) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Stringify params once so useCallback dependency is stable
+  const paramsKey = JSON.stringify(options.params || {});
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -22,7 +25,7 @@ export function useApi(endpoint, options = {}) {
     } finally {
       setLoading(false);
     }
-  }, [endpoint, JSON.stringify(options.params)]);
+  }, [endpoint, paramsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetch();

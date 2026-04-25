@@ -5,7 +5,7 @@ import {
 } from 'recharts';
 import KPICard from '../components/KPICard';
 import ChartCard from '../components/ChartCard';
-import LoadingSpinner, { SkeletonCard } from '../components/LoadingSpinner';
+import { SkeletonCard } from '../components/LoadingSpinner';
 import { useApi } from '../hooks/useApi';
 import './Overview.css';
 

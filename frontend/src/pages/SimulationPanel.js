@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import {
-  AreaChart, Area, LineChart, Line, BarChart, Bar,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  AreaChart, Area, BarChart, Bar,
+  XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer,
 } from 'recharts';
 import ChartCard from '../components/ChartCard';
-import { SkeletonCard } from '../components/LoadingSpinner';
 import { postApi } from '../hooks/useApi';
 import './SimulationPanel.css';
 

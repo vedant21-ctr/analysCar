@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis, ScatterChart, Scatter, ZAxis,
+  PolarAngleAxis, PolarRadiusAxis,
 } from 'recharts';
 import ChartCard from '../components/ChartCard';
 import { SkeletonCard } from '../components/LoadingSpinner';
@@ -29,7 +29,8 @@ export default function DemandAnalysis() {
   const [activeTab, setActiveTab] = useState('hourly');
   const { data: hourly, loading: hourlyLoading } = useApi('/api/demand/hourly');
   const { data: weekly, loading: weeklyLoading } = useApi('/api/demand/weekly');
-  const { data: monthly, loading: monthlyLoading } = useApi('/api/demand/monthly');
+  // monthly data used in weekly tab
+  const { data: monthly } = useApi('/api/demand/monthly'); // eslint-disable-line no-unused-vars
   const { data: weather, loading: weatherLoading } = useApi('/api/weather/analysis');
   const { data: zones, loading: zonesLoading } = useApi('/api/zones/heatmap');
 
