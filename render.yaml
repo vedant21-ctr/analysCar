@@ -2,11 +2,11 @@ services:
   - type: web
     name: urban-mobility-os-api
     runtime: python
-    buildCommand: pip install -r requirements.txt && python data/generate_dataset.py
+    buildCommand: pip install --upgrade pip && pip install --only-binary=:all: pandas==2.2.1 numpy==1.26.4 scikit-learn==1.4.1.post1 && pip install -r requirements.txt && python data/generate_dataset.py
     startCommand: uvicorn backend.api.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.9
+        value: "3.11.9"
       - key: PYTHONPATH
         value: /opt/render/project/src
     healthCheckPath: /
