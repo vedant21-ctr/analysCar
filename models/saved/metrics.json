@@ -1,0 +1,43 @@
+{
+  "demand_model": {
+    "mae": 0.0185,
+    "rmse": 0.0344,
+    "r2": 0.9963
+  },
+  "duration_model": {
+    "mae": 1.5586,
+    "rmse": 1.9537,
+    "r2": 0.9878
+  },
+  "cancellation_model": {
+    "accuracy": 0.7227,
+    "roc_auc": 0.6792,
+    "report": {
+      "0": {
+        "precision": 0.9477674810446504,
+        "recall": 0.7376243033548247,
+        "f1-score": 0.8295950347200884,
+        "support": 9151.0
+      },
+      "1": {
+        "precision": 0.16574009728978456,
+        "recall": 0.5618374558303887,
+        "f1-score": 0.25596994902066006,
+        "support": 849.0
+      },
+      "accuracy": 0.7227,
+      "macro avg": {
+        "precision": 0.5567537891672174,
+        "recall": 0.6497308795926067,
+        "f1-score": 0.5427824918703743,
+        "support": 10000.0
+      },
+      "weighted avg": {
+        "precision": 0.8813733561638623,
+        "recall": 0.7227,
+        "f1-score": 0.780894264944207,
+        "support": 10000.0
+      }
+    }
+  }
+}
