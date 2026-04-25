@@ -13,7 +13,6 @@
     "axios": "^1.6.7",
     "lucide-react": "^0.344.0",
     "recharts": "^2.12.2",
-    "react-countup": "^6.5.3",
     "react-loading-skeleton": "^3.4.0",
     "clsx": "^2.1.0"
   },

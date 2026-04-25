@@ -1,5 +1,4 @@
 import React from 'react';
-import CountUp from 'react-countup';
 import './KPICard.css';
 
 export default function KPICard({
@@ -30,15 +29,13 @@ export default function KPICard({
     pink:   'rgba(236, 72, 153, 0.15)',
   };
 
+  const displayValue = typeof value === 'number'
+    ? value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    : value;
+
   return (
-    <div
-      className="kpi-card"
-      style={{ '--gradient': gradients[gradient] }}
-    >
-      <div
-        className="kpi-icon"
-        style={{ background: iconBgs[gradient] }}
-      >
+    <div className="kpi-card" style={{ '--gradient': gradients[gradient] }}>
+      <div className="kpi-icon" style={{ background: iconBgs[gradient] }}>
         {icon}
       </div>
 
@@ -46,15 +43,7 @@ export default function KPICard({
         className="kpi-value"
         style={{ background: gradients[gradient], WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
       >
-        {prefix}
-        <CountUp
-          end={typeof value === 'number' ? value : parseFloat(value) || 0}
-          duration={1.5}
-          delay={delay}
-          decimals={decimals}
-          separator=","
-        />
-        {suffix}
+        {prefix}{displayValue}{suffix}
       </div>
 
       <div className="kpi-label">{label}</div>
@@ -63,11 +52,10 @@ export default function KPICard({
         <div className={`kpi-change ${change >= 0 ? 'positive' : 'negative'}`}>
           <span>{change >= 0 ? '↑' : '↓'}</span>
           <span>{Math.abs(change)}%</span>
-          {changeLabel && <span className="change-label">{changeLabel}</span>}
+          {changeLabel && <span className="change-label"> {changeLabel}</span>}
         </div>
       )}
 
-      {/* Decorative glow */}
       <div className="kpi-glow" style={{ background: gradients[gradient] }} />
     </div>
   );
