@@ -33,6 +33,8 @@ export default function DecisionInsights() {
   const hours_df = Array.isArray(report?.best_hours) ? report.best_hours : [];
   const surge_df = Array.isArray(report?.surge_recommendations) ? report.surge_recommendations : [];
   const fleet_df = Array.isArray(report?.fleet_plan) ? report.fleet_plan : [];
+
+  const sections = [
     { key: 'zones', label: '📍 Best Zones', icon: '📍' },
     { key: 'hours', label: '⏰ Best Hours', icon: '⏰' },
     { key: 'surge', label: '⚡ Surge Strategy', icon: '⚡' },
@@ -67,7 +69,7 @@ export default function DecisionInsights() {
             <>
               <ChartCard title="Top Zones by Driver Opportunity" subtitle="Composite score based on earnings, demand, and wait time">
                 <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={report?.best_zones || []} layout="vertical" barSize={20}>
+                  <BarChart data={zones_df} layout="vertical" barSize={20}>
                     <defs>
                       <linearGradient id="zoneOppGrad" x1="0" y1="0" x2="1" y2="0">
                         <stop offset="0%" stopColor="#4f8ef7" />
@@ -84,7 +86,7 @@ export default function DecisionInsights() {
               </ChartCard>
 
               <div className="di-cards-grid section">
-                {(report?.best_zones || []).map((zone, i) => (
+                {zones_df.map((zone, i) => (
                   <div key={zone.zone_id} className="di-zone-card">
                     <div className="di-zone-header">
                       <span className="di-zone-rank">#{i + 1}</span>
@@ -124,7 +126,7 @@ export default function DecisionInsights() {
             <>
               <ChartCard title="Driver Opportunity Score by Hour" subtitle="Best hours to maximize earnings">
                 <ResponsiveContainer width="100%" height={280}>
-                  <BarChart data={(report?.best_hours || []).sort((a, b) => a.hour - b.hour)} barSize={18}>
+                  <BarChart data={[...hours_df].sort((a, b) => a.hour - b.hour)} barSize={18}>
                     <defs>
                       <linearGradient id="hourGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.9} />
@@ -154,7 +156,7 @@ export default function DecisionInsights() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(report?.best_hours || []).map(row => (
+                    {hours_df.map(row => (
                       <tr key={row.hour}>
                         <td className="mono">{row.hour}:00</td>
                         <td>{row.label}</td>
@@ -182,7 +184,7 @@ export default function DecisionInsights() {
         <div className="section">
           {loading ? <SkeletonCard height={400} /> : (
             <div className="surge-grid">
-              {(report?.surge_recommendations || []).map((rec, i) => (
+              {surge_df.map((rec, i) => (
                 <div key={i} className={`surge-card priority-${rec.priority?.toLowerCase()}`}>
                   <div className="surge-card-header">
                     <span className="surge-hour">{rec.label}</span>
@@ -225,7 +227,7 @@ export default function DecisionInsights() {
                     </tr>
                   </thead>
                   <tbody>
-                    {(report?.fleet_plan || []).map((row, i) => (
+                    {fleet_df.map((row, i) => (
                       <tr key={i}>
                         <td className="mono blue">{row.zone_id}</td>
                         <td className="mono">{row.hour}:00</td>
