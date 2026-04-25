@@ -37,17 +37,17 @@ export default function Overview() {
   const { data: weather, loading: weatherLoading } = useApi('/api/weather/analysis');
   const { data: hourly, loading: hourlyLoading } = useApi('/api/demand/hourly');
 
-  const monthlyFormatted = monthly?.map(m => ({
+  const monthlyFormatted = Array.isArray(monthly) ? monthly.map(m => ({
     ...m,
     name: MONTH_NAMES[m.month],
     revenue_k: +(m.total_revenue / 1000).toFixed(1),
-  }));
+  })) : [];
 
-  const weatherPie = weather?.map(w => ({
+  const weatherPie = Array.isArray(weather) ? weather.map(w => ({
     name: w.weather,
     value: w.total_rides,
     color: WEATHER_COLORS[w.weather] || '#4f8ef7',
-  }));
+  })) : [];
 
   return (
     <div className="page">

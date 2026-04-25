@@ -34,15 +34,14 @@ export default function DemandAnalysis() {
   const { data: weather, loading: weatherLoading } = useApi('/api/weather/analysis');
   const { data: zones, loading: zonesLoading } = useApi('/api/zones/heatmap');
 
-  const weeklyFormatted = weekly?.map(w => ({ ...w, name: DAYS[w.weekday] }));
-  const topZones = zones?.sort((a, b) => b.avg_demand - a.avg_demand).slice(0, 10);
-
-  const radarData = weather?.map(w => ({
+  const weeklyFormatted = Array.isArray(weekly) ? weekly.map(w => ({ ...w, name: DAYS[w.weekday] })) : [];
+  const topZones = Array.isArray(zones) ? zones.sort((a, b) => b.avg_demand - a.avg_demand).slice(0, 10) : [];
+  const radarData = Array.isArray(weather) ? weather.map(w => ({
     subject: w.weather,
     demand: +(w.avg_demand * 100).toFixed(0),
     fare: +(w.avg_fare).toFixed(0),
     cancel: +(w.cancel_rate * 100).toFixed(0),
-  }));
+  })) : [];
 
   return (
     <div className="page">

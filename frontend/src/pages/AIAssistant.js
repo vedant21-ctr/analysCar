@@ -141,7 +141,7 @@ export default function AIAssistant() {
                 <div className="insights-category-label">
                   {CATEGORY_ICONS[activeCategory]} {activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1)} Insights
                 </div>
-                {insights?.[activeCategory]?.map((insight, i) => (
+                {(insights?.[activeCategory] || []).map((insight, i) => (
                   <div
                     key={i}
                     className="insight-card"
