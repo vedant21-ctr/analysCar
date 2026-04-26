@@ -21,7 +21,7 @@
 
 .kpi-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow);
   border-color: var(--border-hover);
 }
 

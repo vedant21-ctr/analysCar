@@ -49,31 +49,31 @@
 .grid-4 {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .grid-2-1 {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
 .grid-1-2 {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 20px;
+  gap: 24px;
 }
 
 /* Card */
@@ -88,7 +88,7 @@
 
 .card:hover {
   border-color: var(--border-hover);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow);
 }
 
@@ -128,7 +128,7 @@
 }
 
 .kpi-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   box-shadow: var(--shadow);
   border-color: var(--border-hover);
 }

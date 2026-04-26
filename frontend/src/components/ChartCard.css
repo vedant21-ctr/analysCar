@@ -3,11 +3,13 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 24px;
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .chart-card:hover {
   border-color: var(--border-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
 }
 
 .chart-card-header {
