@@ -14,7 +14,14 @@ import pandas as pd
 from typing import Dict, Any
 
 from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier, GradientBoostingRegressor
+from sklearn.ensemble import (
+    RandomForestRegressor, RandomForestClassifier, 
+    GradientBoostingRegressor, GradientBoostingClassifier,
+    ExtraTreesRegressor, ExtraTreesClassifier,
+    StackingRegressor, StackingClassifier
+)
+from sklearn.neural_network import MLPRegressor, MLPClassifier
+from sklearn.linear_model import Ridge, LogisticRegression
 from sklearn.metrics import (
     mean_absolute_error, mean_squared_error, r2_score,
     accuracy_score, classification_report, roc_auc_score,
@@ -47,6 +54,12 @@ class ModelRegistry:
             self.feature_importances[name] = pd.Series(
                 model.feature_importances_, index=feature_names
             ).sort_values(ascending=False)
+        elif hasattr(model, "named_estimators_"):
+            base = list(model.named_estimators_.values())[0]
+            if hasattr(base, "feature_importances_"):
+                self.feature_importances[name] = pd.Series(
+                    base.feature_importances_, index=feature_names
+                ).sort_values(ascending=False)
 
     def save(self, directory: str):
         os.makedirs(directory, exist_ok=True)
@@ -90,21 +103,22 @@ def _prepare(df: pd.DataFrame, target: str):
     return train_test_split(X, y, test_size=0.2, random_state=42), available
 
 
-# ─── 1. Demand Prediction ─────────────────────────────────────────────────────
 def train_demand_model(df: pd.DataFrame) -> dict:
-    print("\n🤖 Training Demand Prediction Model...")
+    print("\n🤖 Training 'Crazy Good' Demand Prediction Model (Stacking Ensemble)...")
     (X_train, X_test, y_train, y_test), feats = _prepare(df, "demand_score")
 
+    estimators = [
+        ('rf', RandomForestRegressor(n_estimators=200, max_depth=10, random_state=42, n_jobs=-1)),
+        ('et', ExtraTreesRegressor(n_estimators=150, max_depth=12, random_state=42, n_jobs=-1)),
+        ('gbr', GradientBoostingRegressor(n_estimators=150, max_depth=6, random_state=42))
+    ]
     if HAS_XGB:
-        model = XGBRegressor(
-            n_estimators=300, max_depth=6, learning_rate=0.05,
-            subsample=0.8, colsample_bytree=0.8, random_state=42, n_jobs=-1
-        )
-    else:
-        model = RandomForestRegressor(
-            n_estimators=200, max_depth=10, min_samples_leaf=3,
-            random_state=42, n_jobs=-1
-        )
+        estimators.append(('xgb', XGBRegressor(n_estimators=200, max_depth=6, learning_rate=0.05, random_state=42, n_jobs=-1)))
+
+    model = StackingRegressor(
+        estimators=estimators,
+        final_estimator=Ridge(alpha=1.0)
+    )
 
     model.fit(X_train, y_train)
     preds = model.predict(X_test)
@@ -121,12 +135,19 @@ def train_demand_model(df: pd.DataFrame) -> dict:
 
 # ─── 2. Duration Prediction ───────────────────────────────────────────────────
 def train_duration_model(df: pd.DataFrame) -> dict:
-    print("\n🤖 Training Ride Duration Model...")
+    print("\n🤖 Training 'Crazy Good' Ride Duration Model (Stacking Ensemble)...")
     (X_train, X_test, y_train, y_test), feats = _prepare(df, "duration_min")
 
-    model = RandomForestRegressor(
-        n_estimators=200, max_depth=10, min_samples_leaf=5,
-        random_state=42, n_jobs=-1
+    estimators = [
+        ('rf', RandomForestRegressor(n_estimators=200, max_depth=12, random_state=42, n_jobs=-1)),
+        ('mlp', MLPRegressor(hidden_layer_sizes=(100, 50), max_iter=200, random_state=42))
+    ]
+    if HAS_XGB:
+        estimators.append(('xgb', XGBRegressor(n_estimators=150, max_depth=6, random_state=42, n_jobs=-1)))
+
+    model = StackingRegressor(
+        estimators=estimators,
+        final_estimator=Ridge(alpha=1.0)
     )
     model.fit(X_train, y_train)
     preds = model.predict(X_test)
@@ -143,19 +164,20 @@ def train_duration_model(df: pd.DataFrame) -> dict:
 
 # ─── 3. Cancellation Prediction ───────────────────────────────────────────────
 def train_cancellation_model(df: pd.DataFrame) -> dict:
-    print("\n🤖 Training Cancellation Prediction Model...")
+    print("\n🤖 Training 'Crazy Good' Cancellation Prediction Model (Stacking Ensemble)...")
     (X_train, X_test, y_train, y_test), feats = _prepare(df, "cancelled")
 
+    estimators = [
+        ('rf', RandomForestClassifier(n_estimators=200, max_depth=10, class_weight="balanced", random_state=42, n_jobs=-1)),
+        ('gbc', GradientBoostingClassifier(n_estimators=150, max_depth=5, random_state=42))
+    ]
     if HAS_XGB:
-        model = XGBClassifier(
-            n_estimators=200, max_depth=5, learning_rate=0.05,
-            scale_pos_weight=5, random_state=42, n_jobs=-1, eval_metric="logloss"
-        )
-    else:
-        model = RandomForestClassifier(
-            n_estimators=200, max_depth=8, class_weight="balanced",
-            random_state=42, n_jobs=-1
-        )
+        estimators.append(('xgb', XGBClassifier(n_estimators=200, max_depth=5, learning_rate=0.05, scale_pos_weight=5, random_state=42, n_jobs=-1, eval_metric="logloss")))
+
+    model = StackingClassifier(
+        estimators=estimators,
+        final_estimator=LogisticRegression(class_weight="balanced")
+    )
     model.fit(X_train, y_train)
     preds = model.predict(X_test)
     proba = model.predict_proba(X_test)[:, 1]
